@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hogwarts Chat - Harry Potter Universe</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
+    <style>
+        :root {
+            --hogwarts-red: #740001;
+            --hogwarts-gold: #D3A625;
+            --hogwarts-dark: #1A472A;
+            --hogwarts-light: #F0C75E;
+            --parchment: #f4ecd8;
+            --ink: #2a2922;
+        }
+
+        @font-face {
+            font-family: 'Harry Potter';
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/fonts/slick.ttf') format('truetype');
+            /* Note: This is a placeholder - actual Harry Potter font would need to be hosted separately */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+            background-color: #000;
+            background-image: url('/api/placeholder/1920/1080');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--ink);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--hogwarts-dark);
+            color: var(--hogwarts-gold);
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header-logo {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+        }
+
+        h1 {
+            font-family: 'Harry Potter', fantasy;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 0;
+        }
+
+        .chat-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 0 0 10px 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 10px;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: #306754;
+            color: white;
+            border-top-right-radius: 0;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background-color: var(--parchment);
+            color: var(--ink);
+            border-top-left-radius: 0;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            background-image: url('/api/placeholder/100/100');
+            background-repeat: repeat;
+        }
+
+        .bot-message::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            border-width: 0 10px 10px 0;
+            border-style: solid;
+            border-color: transparent var(--parchment) transparent transparent;
+        }
+
+        .user-message::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            border-width: 0 0 10px 10px;
+            border-style: solid;
+            border-color: transparent transparent transparent #306754;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            background-color: rgba(26, 71, 42, 0.8);
+            border-top: 2px solid var(--hogwarts-gold);
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 30px;
+            background-color: var(--parchment);
+            color: var(--ink);
+            font-family: inherit;
+            font-size: 1rem;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--hogwarts-gold);
+        }
+
+        .send-btn {
+            background-color: var(--hogwarts-gold);
+            color: var(--hogwarts-dark);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            background-color: #f1bb36;
+            transform: scale(1.05);
+        }
+
+        .clear-btn {
+            background-color: var(--hogwarts-red);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 0 20px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background-color: #8a0303;
+        }
+
+        /* Animation for typing indicator */
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background-color: var(--parchment);
+            padding: 15px;
+            border-radius: 10px;
+            border-top-left-radius: 0;
+            margin-bottom: 15px;
+        }
+
+        .typing-indicator span {
+            height: 10px;
+            width: 10px;
+            float: left;
+            margin: 0 1px;
+            background-color: var(--hogwarts-dark);
+            display: block;
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+
+        .typing-indicator span:nth-of-type(1) {
+            animation: typing 1s infinite;
+        }
+
+        .typing-indicator span:nth-of-type(2) {
+            animation: typing 1s infinite 0.25s;
+        }
+
+        .typing-indicator span:nth-of-type(3) {
+            animation: typing 1s infinite 0.5s;
+        }
+
+        @keyframes typing {
+            0% {
+                opacity: 0.4;
+                transform: translateY(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-5px);
+            }
+            100% {
+                opacity: 0.4;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scrollbar styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: var(--hogwarts-gold);
+            border-radius: 10px;
+        }
+
+        /* Loading animation and splash screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--hogwarts-dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 1s ease-out;
+        }
+
+        .splash-logo {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .splash-title {
+            font-family: 'Harry Potter', fantasy;
+            font-size: 3rem;
+            color: var(--hogwarts-gold);
+            text-shadow: 0 0 10px rgba(211, 166, 37, 0.7);
+            margin-bottom: 30px;
+        }
+
+        .loading-wand {
+            position: relative;
+            width: 200px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .loading-spell {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: var(--hogwarts-gold);
+            animation: castSpell 3s ease-in-out forwards;
+            box-shadow: 0 0 10px var(--hogwarts-gold);
+        }
+
+        @keyframes castSpell {
+            0% {
+                width: 0;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .chat-input-container {
+                padding: 15px;
+            }
+        }
+
+        /* Markdown styling for bot responses */
+        .bot-message p {
+            margin-bottom: 10px;
+        }
+
+        .bot-message h1, .bot-message h2, .bot-message h3 {
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: var(--hogwarts-dark);
+        }
+
+        .bot-message ul, .bot-message ol {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .bot-message strong {
+            color: var(--hogwarts-red);
+        }
+
+        .bot-message em {
+            color: var(--hogwarts-dark);
+        }
+
+        .bot-message code {
+            background-color: rgba(0, 0, 0, 0.1);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .bot-message blockquote {
+            border-left: 3px solid var(--hogwarts-gold);
+            padding-left: 10px;
+            margin: 10px 0;
+            color: #555;
+            font-style: italic;
+        }
+
+        /* Houses theme selector */
+        .houses-selector {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .house-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .house-btn:hover, .house-btn.active {
+            transform: scale(1.2);
+            border-color: white;
+        }
+
+        .gryffindor {
+            background: linear-gradient(135deg, #740001 50%, #D3A625 50%);
+        }
+
+        .slytherin {
+            background: linear-gradient(135deg, #1A472A 50%, #5D5D5D 50%);
+        }
+
+        .ravenclaw {
+            background: linear-gradient(135deg, #0E1A40 50%, #946B2D 50%);
+        }
+
+        .hufflepuff {
+            background: linear-gradient(135deg, #ECB939 50%, #000000 50%);
+        }
+
+        /* Sound effects toggle */
+        .sound-toggle {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: var(--hogwarts-gold);
+            color: var(--hogwarts-dark);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sound-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Spell effects */
+        .spell-effect {
+            position: absolute;
+            pointer-events: none;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: none;
+        }
+
+        .spell-particles {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--hogwarts-gold);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--hogwarts-gold);
+            animation: spell-particle 2s ease-out forwards;
+        }
+
+        @keyframes spell-particle {
+            0% {
+                transform: scale(0) translate(0, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) translate(var(--x), var(--y));
+                opacity: 0;
+            }
+        }
+
+        /* Chat history section */
+        .chat-history-btn {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background-color: var(--hogwarts-dark);
+            color: var(--hogwarts-gold);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .chat-history-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-history-panel {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: var(--parchment);
+            padding: 20px;
+            transition: right 0.3s ease;
+            z-index: 900;
+            overflow-y: auto;
+        }
+
+        .chat-history-panel.active {
+            right: 0;
+        }
+
+        .chat-history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: var(--hogwarts-gold);
+        }
+
+        .chat-history-close {
+            background: none;
+            border: none;
+            color: var(--hogwarts-gold);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .history-item {
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .history-item span {
+            font-weight: bold;
+            color: var(--hogwarts-gold);
+        }
+
+        /* Magical tooltips */
+        [data-spell] {
+            position: relative;
+            cursor: help;
+            text-decoration: underline dotted var(--hogwarts-gold);
+        }
+
+        [data-spell]:hover::after {
+            content: attr(data-spell);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--hogwarts-dark);
+            color: var(--hogwarts-gold);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 100;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div class="splash-screen">
+        <img src="/api/placeholder/150/150" class="splash-logo" alt="Hogwarts Logo">
+        <h2 class="splash-title">Hogwarts Chat</h2>
+        <div class="loading-wand">
+            <div class="loading-spell"></div>
+        </div>
+    </div>
+
+    <!-- Main Chat Interface -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <img src="/api/placeholder/50/50" class="header-logo" alt="Hogwarts Crest">
+                <h1>Hogwarts Chat: Harry Potter Universe</h1>
+            </div>
+            <div class="houses-selector">
+                <div class="house-btn gryffindor" data-house="gryffindor" title="Gryffindor"></div>
+                <div class="house-btn slytherin" data-house="slytherin" title="Slytherin"></div>
+                <div class="house-btn ravenclaw" data-house="ravenclaw" title="Ravenclaw"></div>
+                <div class="house-btn hufflepuff" data-house="hufflepuff" title="Hufflepuff"></div>
+            </div>
+            <button class="sound-toggle" aria-label="Toggle sound effects">
+                <i class="fas fa-volume-up"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-messages">
+                <div class="message bot-message">
+                    <p>Welcome to Hogwarts Chat! I'm your guide to the magical world of Harry Potter. What would you like to know about?</p>
+                    <p><em>You can ask me about characters, spells, magical creatures, Hogwarts houses, or anything related to Harry Potter!</em></p>
+                </div>
+            </div>
+            <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" placeholder="Ask something about Harry Potter..." aria-label="Message">
+                <button class="clear-btn" aria-label="Clear chat">Obliviate!</button>
+                <button class="send-btn" aria-label="Send message">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sound Effects -->
+    <audio id="send-sound" preload="auto">
+        <source src="/api/placeholder/audio" type="audio/mp3">
+    </audio>
+    <audio id="receive-sound" preload="auto">
+        <source src="/api/placeholder/audio" type="audio/mp3">
+    </audio>
+    <audio id="clear-sound" preload="auto">
+        <source src="/api/placeholder/audio" type="audio/mp3">
+    </audio>
+
+    <!-- Magic spell effect container -->
+    <div class="spell-effect"></div>
+
+    <!-- Chat History Panel -->
+    <button class="chat-history-btn" aria-label="View chat history">
+        <i class="fas fa-history"></i>
+    </button>
+    <div class="chat-history-panel">
+        <div class="chat-history-header">
+            <h3>Previous Conversations</h3>
+            <button class="chat-history-close" aria-label="Close history panel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="history-items">
+            <!-- History items will be dynamically added here -->
+        </div>
+    </div>
+
+    <script>
+        // Chat functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait for splash screen animation
+            setTimeout(() => {
+                document.querySelector('.splash-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.querySelector('.splash-screen').style.display = 'none';
+                }, 1000);
+            }, 3000);
+
+            // DOM elements
+            const chatMessages = document.querySelector('.chat-messages');
+            const chatInput = document.querySelector('.chat-input');
+            const sendBtn = document.querySelector('.send-btn');
+            const clearBtn = document.querySelector('.clear-btn');
+            const typingIndicator = document.querySelector('.typing-indicator');
+            const houseButtons = document.querySelectorAll('.house-btn');
+            const soundToggle = document.querySelector('.sound-toggle');
+            const spellEffect = document.querySelector('.spell-effect');
+            const chatHistoryBtn = document.querySelector('.chat-history-btn');
+            const chatHistoryPanel = document.querySelector('.chat-history-panel');
+            const chatHistoryClose = document.querySelector('.chat-history-close');
+            const historyItems = document.querySelector('.history-items');
+
+            // Audio elements
+            const sendSound = document.getElementById('send-sound');
+            const receiveSound = document.getElementById('receive-sound');
+            const clearSound = document.getElementById('clear-sound');
+
+            // API URL - change to your FastAPI server address
+            const API_URL = 'http://localhost:8000';
+            let sessionId = generateSessionId();
+            let soundEnabled = true;
+            let chatHistory = JSON.parse(localStorage.getItem('harryPotterChatHistory')) || [];
+
+            // House themes
+            const houseThemes = {
+                gryffindor: {
+                    '--hogwarts-dark': '#740001',
+                    '--hogwarts-light': '#D3A625',
+                    '--hogwarts-gold': '#D3A625',
+                    '--hogwarts-red': '#AF0001'
+                },
+                slytherin: {
+                    '--hogwarts-dark': '#1A472A',
+                    '--hogwarts-light': '#2A623D',
+                    '--hogwarts-gold': '#AAAAAA',
+                    '--hogwarts-red': '#5D5D5D'
+                },
+                ravenclaw: {
+                    '--hogwarts-dark': '#0E1A40',
+                    '--hogwarts-light': '#222F5B',
+                    '--hogwarts-gold': '#946B2D',
+                    '--hogwarts-red': '#0E1A40'
+                },
+                hufflepuff: {
+                    '--hogwarts-dark': '#000000',
+                    '--hogwarts-light': '#372E29',
+                    '--hogwarts-gold': '#ECB939',
+                    '--hogwarts-red': '#726255'
+                }
+            };
+
+            // Apply house theme 
+            function applyHouseTheme(house) {
+                const theme = houseThemes[house];
+                Object.keys(theme).forEach(key => {
+                    document.documentElement.style.setProperty(key, theme[key]);
+                });
+
+                // Update active button
+                houseButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.house === house) {
+                        btn.classList.add('active');
+                    }
+                });
+
+                // Save preference
+                localStorage.setItem('harryPotterHouse', house);
+            }
+
+            // Set initial house theme from saved preference or default to Gryffindor
+            const savedHouse = localStorage.getItem('harryPotterHouse') || 'gryffindor';
+            applyHouseTheme(savedHouse);
+
+            // Add house theme button listeners
+            houseButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    applyHouseTheme(btn.dataset.house);
+                });
+                if (btn.dataset.house === savedHouse) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Function to generate a unique session ID
+            function generateSessionId() {
+                return 'session-' + Math.random().toString(36).substring(2, 15);
+            }
+
+            // Function to add a message to the chat
+            function addMessage(message, isUser) {
+                const msgElement = document.createElement('div');
+                msgElement.classList.add('message');
+                msgElement.classList.add(isUser ? 'user-message' : 'bot-message');
+                
+                if (isUser) {
+                    msgElement.textContent = message;
+                } else {
+                    // Parse markdown for bot messages
+                    msgElement.innerHTML = marked.parse(message);
+                    
+                    // Add spell tooltips for magical terms
+                    addSpellTooltips(msgElement);
+                }
+                
+                chatMessages.appendChild(msgElement);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Play sound if enabled
+                if (soundEnabled) {
+                    if (isUser) {
+                        sendSound.play();
+                    } else {
+                        receiveSound.play();
+                    }
+                }
+                
+                // Add spell effect for messages
+                if (!isUser) {
+                    createSpellEffect();
+                }
+            }
+
+            // Function to add spell tooltips to magical terms
+            function addSpellTooltips(element) {
+                const magicalTerms = {
+                    'Accio': 'Summoning Charm',
+                    'Alohomora': 'Unlocking Charm',
+                    'Expecto Patronum': 'Patronus Charm',
+                    'Expelliarmus': 'Disarming Charm',
+                    'Lumos': 'Wand-Lighting Charm',
+                    'Wingardium Leviosa': 'Levitation Charm',
+                    'Hogwarts': 'School of Witchcraft and Wizardry',
+                    'Muggles': 'Non-magical people',
+                    'Quidditch': 'Wizarding sport played on broomsticks'
+                };
+                
+                Object.keys(magicalTerms).forEach(term => {
+                    const regex = new RegExp(`\\b${term}\\b`, 'gi');
+                    element.innerHTML = element.innerHTML.replace(regex, 
+                        `<span data-spell="${magicalTerms[term]}">$&</span>`);
+                });
+            }
+
+            // Function to create spell effect
+            function createSpellEffect() {
+                spellEffect.style.display = 'block';
+                spellEffect.innerHTML = '';
+                
+                const particleCount = 50;
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('spell-particles');
+                    
+                    // Random position and movement
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight;
+                    const moveX = (Math.random() - 0.5) * 200;
+                    const moveY = (Math.random() - 0.5) * 200;
+                    
+                    particle.style.left = `${x}px`;
+                    particle.style.top = `${y}px`;
+                    particle.style.setProperty('--x', `${moveX}px`);
+                    particle.style.setProperty('--y', `${moveY}px`);
+                    
+                    spellEffect.appendChild(particle);
+                }
+                
+                setTimeout(() => {
+                    spellEffect.style.display = 'none';
+                }, 2000);
+            }
+
+            // Function to send message to API
+            async function sendMessageToAPI(message) {
+                try {
+                    const response = await fetch(`${API_URL}/chat`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            session_id: sessionId
+                        }),
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    
+                    const data = await response.json();
+                    return data.response;
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    return "I'm having trouble with my magic connection. Please try again later.";
+                }
+            }
+
+            // Function to handle message submission
+            async function handleMessageSubmit() {
+                const message = chatInput.value.trim();
+                if (message === '') return;
+                
+                // Add user message to chat
+                addMessage(message, true);
+                
+                // Clear input
+                chatInput.value = '';
+                
+                // Show typing indicator
+                typingIndicator.style.display = 'block';
+                
+                // Get response from API
+                const response = await sendMessageToAPI(message);
+                
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+                
+                // Add bot response to chat
+                addMessage(response, false);
+                
+                // Save to chat history
+                saveChatHistory(message, response);
+            }
+
+            // Function to save chat history
+            function saveChatHistory(userMessage, botResponse) {
+                const timestamp = new Date().toISOString();
+                const chatEntry = {
+                    id: Date.now(),
+                    timestamp: timestamp,
+                    session: sessionId,
+                    userMessage: userMessage,
+                    botResponse: botResponse
+                };
+                
+                chatHistory.unshift(chatEntry);
+                
+                // Keep only the latest 10 conversations
+                if (chatHistory.length > 10) {
+                    chatHistory = chatHistory.slice(0, 10);
+                }
+                
+                // Save to local storage
+                localStorage.setItem('harryPotterChatHistory', JSON.stringify(chatHistory));
+                
+                // Update history panel
+                updateHistoryPanel();
+            }
+
+            // Function to update history panel
+            function updateHistoryPanel() {
+                historyItems.innerHTML = '';
+                
+                if (chatHistory.length === 0) {
+                    const emptyItem = document.createElement('div');
+                    emptyItem.classList.add('history-item');
+                    emptyItem.textContent = 'No previous conversations yet';
+                    historyItems.appendChild(emptyItem);
+                    return;
+                }
+                
+                chatHistory.forEach(entry => {
+                    const historyItem = document.createElement('div');
+                    historyItem.classList.add('history-item');
+                    
+                    // Format date
+                    const date = new Date(entry.timestamp);
+                    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+                    
+                    historyItem.innerHTML = `
+                        <span>${formattedDate}</span>
+                        <p>${entry.userMessage.substring(0, 30)}${entry.userMessage.length > 30 ? '...' : ''}</p>
+                    `;
+                    
+                    historyItem.addEventListener('click', () => {
+                        // Load this conversation
+                        loadConversation(entry);
+                        // Close panel
+                        chatHistoryPanel.classList.remove('active');
+                    });
+                    
+                    historyItems.appendChild(historyItem);
+                });
+            }
+
+            // Function to load a conversation
+            function loadConversation(entry) {
+                // Clear current chat
+                chatMessages.innerHTML = '';
+                
+                // Add welcome message
+                const welcomeMsg = document.createElement('div');
+                welcomeMsg.classList.add('message', 'bot-message');
+                welcomeMsg.innerHTML = `
+                    <p>Welcome back to our conversation about "${entry.userMessage}"!</p>
+                    <p><em>You asked:</em></p>
+                `;
+                chatMessages.appendChild(welcomeMsg);
+                
+                // Add user message
+                addMessage(entry.userMessage, true);
+                
+                // Add bot response
+                addMessage(entry.botResponse, false);
+            }
+
+            // Function to clear chat
+            function clearChat() {
+                // Play clear sound if enabled
+                if (soundEnabled) {
+                    clearSound.play();
+                }
+                
+                // Show spell effect
+                createSpellEffect();
+                
+                // Clear messages
+                chatMessages.innerHTML = '';
+                
+                // Add welcome message back
+                const welcomeMsg = document.createElement('div');
+                welcomeMsg.classList.add('message', 'bot-message');
+                welcomeMsg.innerHTML = `
+                    <p>Welcome to Hogwarts Chat! I'm your guide to the magical world of Harry Potter. What would you like to know about?</p>
+                    <p><em>You can ask me about characters, spells, magical creatures, Hogwarts houses, or anything related to Harry Potter!</em></p>
+                `;
+                chatMessages.appendChild(welcomeMsg);
+                
+                // Generate new session ID
+                sessionId = generateSessionId();
+            }
+
+            // Event listeners
+            sendBtn.addEventListener('click', handleMessageSubmit);
+            
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleMessageSubmit();
+                }
+            });
+            
+            clearBtn.addEventListener('click', clearChat);
+            
+            // Sound toggle
+            soundToggle.addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                soundToggle.innerHTML = soundEnabled ? 
+                    '<i class="fas fa-volume-up"></i>' : 
+                    '<i class="fas fa-volume-mute"></i>';
+                
+                // Save preference
+                localStorage.setItem('harryPotterSoundEnabled', soundEnabled);
+            });
+            
+            // Chat history panel toggle
+            chatHistoryBtn.addEventListener('click', () => {
+                chatHistoryPanel.classList.add('active');
+                updateHistoryPanel();
+            });
+            
+            chatHistoryClose.addEventListener('click', () => {
+                chatHistoryPanel.classList.remove('active');
+            });
+            
+            // Check sound preference
+            if (localStorage.getItem('harryPotterSoundEnabled') === 'false') {
+                soundEnabled = false;
+                soundToggle.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            }
+            
+            // Add some predefined responses for common questions
+            const predefinedResponses = {
+                'who is harry potter': "Harry Potter is the main protagonist of the series. He's a wizard who survived an attack by the dark wizard Lord Voldemort as a baby, leaving him with a lightning-shaped scar on his forehead. He attends Hogwarts School of Witchcraft and Wizardry where he discovers his magical abilities and learns about his destiny.",
+                'what are the hogwarts houses': "Hogwarts School of Witchcraft and Wizardry has four houses: Gryffindor (brave and chivalrous), Slytherin (ambitious and cunning), Ravenclaw (intelligent and wise), and Hufflepuff (loyal and hardworking). Students are sorted into these houses by the Sorting Hat when they first arrive at Hogwarts.",
+                'what is quidditch': "Quidditch is the most popular wizarding sport played on broomsticks. Each team has seven players: three Chasers, two Beaters, one Keeper, and one Seeker. The Chasers score goals with the Quaffle, the Beaters hit Bludgers at opponents, the Keeper guards the goal hoops, and the Seeker tries to catch the Golden Snitch to end the game."
+            };
+            
+            // Initial load of history panel
+            updateHistoryPanel();
+            
+            // Enhanced keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Alt+S to toggle sound
+                if (e.altKey && e.key === 's') {
+                    soundEnabled = !soundEnabled;
+                    soundToggle.innerHTML = soundEnabled ? 
+                        '<i class="fas fa-volume-up"></i>' : 
+                        '<i class="fas fa-volume-mute"></i>';
+                    localStorage.setItem('harryPotterSoundEnabled', soundEnabled);
+                }
+                
+                // Alt+C to clear chat
+                if (e.altKey && e.key === 'c') {
+                    clearChat();
+                }
+                
+                // Alt+H to toggle history panel
+                if (e.altKey && e.key === 'h') {
+                    if (chatHistoryPanel.classList.contains('active')) {
+                        chatHistoryPanel.classList.remove('active');
+                    } else {
+                        chatHistoryPanel.classList.add('active');
+                        updateHistoryPanel();
+                    }
+                }
+            });
+            
+            // Process messages with predefined responses if available
+            chatInput.addEventListener('input', () => {
+                const inputText = chatInput.value.trim().toLowerCase();
+                
+                // Show autocomplete suggestions
+                if (inputText.length > 2) {
+                    const matchingResponses = Object.keys(predefinedResponses).filter(
+                        key => key.includes(inputText)
+                    );
+                    
+                    if (matchingResponses.length > 0) {
+                        // Could implement an autocomplete dropdown here
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
