@@ -1,6 +1,6 @@
 ## 🧙‍♂️ Harry-Potter-AI-Bot
 
-An AI-powered conversational bot infused with the magical world of **Harry Potter**, built by embedding book knowledge into **Pinecone** and giving the AI a unique fan-like personality. Ask it anything about the wizarding world — from deep lore to character facts — and get accurate, personality-rich responses like you're chatting with a true Hogwarts expert.
+An AI-powered conversational bot infused with the magical world of **Harry Potter**, built by embedding book knowledge into **Pinecone** and giving the AI a unique fan-like personality. Ask it anything about the wizarding world, from deep lore to character facts, and get accurate, personality-rich responses like you're chatting with a true Hogwarts expert.
 
 ---
 
@@ -8,7 +8,7 @@ An AI-powered conversational bot infused with the magical world of **Harry Potte
 
 **Harry-Potter-AI-Bot** is a fan-focused conversational AI trained using the content of the official Harry Potter books. Using **OpenAI** for natural language understanding and **Pinecone vector database** for semantic retrieval, the bot answers any question related to the Harry Potter universe.
 
-When book content is insufficient, the AI fills gaps using its general language model capabilities — always staying in character as a passionate Harry Potter enthusiast.
+When book content is insufficient, the AI fills gaps using its general language model capabilities, always staying in character as a passionate Harry Potter enthusiast.
 
 ---
 
